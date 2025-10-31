@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pkgsizer"
 version = "0.1.1"
-description = "Python package size analyzer - measure disk sizes, analyze dependencies, find unused packages, optimize Docker images"
+description = "Python package size analyzer - measures disk sizes of installed packages, analyzes dependencies, finds unused packages, suggests alternatives, compares environments, and optimizes Docker images. CLI tool for Python developers to optimize package footprints."
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [

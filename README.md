@@ -2,13 +2,34 @@
 
 **Python Package Size Analyzer** - Measure, analyze, and optimize Python package disk sizes. Find unused dependencies, analyze dependency trees, compare environments, and optimize Docker images.
 
-pkgsizer is a comprehensive tool for analyzing Python package sizes and dependencies. It helps developers:
+## Quick Summary
+
+**pkgsizer** is a Python CLI tool that analyzes the **disk space** used by installed Python packages. It measures actual on-disk sizes (not download sizes), helps optimize Docker images, finds unused dependencies, suggests lighter alternatives, and compares environments.
+
+**Key Capabilities:**
 - 📦 **Measure package disk sizes** - See how much space each package uses
 - 🔍 **Analyze dependencies** - Understand your dependency tree and why packages are installed
 - 🗑️ **Find unused packages** - Discover dependencies you're not using
 - 💡 **Find alternatives** - Get suggestions for lighter package alternatives
 - 🔄 **Compare environments** - Side-by-side comparison of different Python environments
 - 🐳 **Optimize Docker images** - Reduce image sizes by identifying large dependencies
+
+**Installation:**
+```bash
+pip install pkgsizer
+```
+
+**Quick Example:**
+```bash
+# Find largest packages
+pkgsizer scan-env --top 10
+
+# Find unused dependencies
+pkgsizer unused ./src
+
+# Compare two environments
+pkgsizer compare ./dev_venv ./prod_venv
+```
 
 ## What is pkgsizer?
 
@@ -20,6 +41,22 @@ pkgsizer is a Python package size analyzer that helps developers understand and 
 - **Environment analysis**: Compare development vs production environments
 - **Package size auditing**: Track package sizes over time
 - **CI/CD integration**: Fail builds if dependencies exceed size thresholds
+
+## When to Use pkgsizer
+
+Use **pkgsizer** when you need to:
+- ✅ Know which packages use the most disk space
+- ✅ Optimize Docker image sizes by removing large packages
+- ✅ Find unused dependencies that can be safely removed
+- ✅ Compare sizes between development and production environments
+- ✅ Get suggestions for lighter alternative packages
+- ✅ Enforce size budgets in CI/CD pipelines
+- ✅ Understand why large packages are installed (dependency analysis)
+
+**Don't use pkgsizer** when you need:
+- ❌ Security vulnerability scanning (use [pip-audit](https://github.com/pypa/pip-audit))
+- ❌ Just dependency tree visualization without size info (use [pipdeptree](https://github.com/tox-dev/pipdeptree))
+- ❌ Only unused dependency detection without size analysis (use [deptry](https://github.com/fpgmaas/deptry))
 
 ## Features
 
@@ -451,6 +488,44 @@ ruff check pkgsizer
 mypy pkgsizer
 ```
 
+## Frequently Asked Questions (FAQ)
+
+### What does pkgsizer do?
+pkgsizer analyzes the **disk space** used by Python packages in your environment. It measures actual on-disk sizes, analyzes dependency trees, finds unused dependencies, suggests alternatives, and helps optimize Docker images.
+
+### How is pkgsizer different from pipdeptree?
+While pipdeptree shows dependency relationships, pkgsizer adds **size analysis** - showing how much disk space each package uses. pkgsizer also finds unused dependencies, suggests lighter alternatives, and compares environments.
+
+### Can pkgsizer reduce my Docker image size?
+Yes! pkgsizer identifies large packages before building images, helps find unused dependencies to remove, and suggests lighter alternatives. Use it in your Dockerfile build process to analyze dependencies.
+
+### Does pkgsizer work with virtual environments?
+Yes! pkgsizer supports venv, conda, pyenv, and custom site-packages directories. Use `--venv` or `--site-packages` to specify the environment.
+
+### Can I use pkgsizer in CI/CD?
+Absolutely! pkgsizer supports JSON export and `--fail-over` threshold flags. You can fail builds if dependencies exceed size limits, or export size reports for tracking.
+
+### What file formats does pkgsizer support?
+pkgsizer supports:
+- `requirements.txt` (pip)
+- `pyproject.toml` (Poetry, uv)
+- `poetry.lock`
+- `uv.lock`
+- `environment.yml` (Conda)
+- `Pipfile` (pipenv)
+
+### Does pkgsizer measure download size or installed size?
+pkgsizer measures **installed on-disk sizes** (what's actually on your filesystem), not wheel download sizes. This is more accurate for Docker images and disk optimization.
+
+### How accurate is the unused dependency detection?
+pkgsizer scans your code for import statements. It's quite accurate but may have false positives for dynamic imports or string-based imports. Review results before removing dependencies.
+
+### Is pkgsizer faster than scanning manually?
+Much faster! pkgsizer uses parallel scanning, inode deduplication, and smart caching. Typical scan time is 1-5 seconds for 100 packages.
+
+### Can pkgsizer find alternatives for any package?
+pkgsizer has a built-in database of 24 popular packages with known alternatives. For others, you can use `--list-all` to browse alternatives, or contribute more alternatives.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -469,11 +544,38 @@ MIT License - see LICENSE file for details.
 - [ ] Cache integration for faster repeated scans
 - [ ] Plugin system for custom analyzers
 
+## Comparison with Similar Tools
+
+| Feature | pkgsizer | pipdeptree | pip-audit | deptry |
+|---------|----------|------------|-----------|--------|
+| **Package size analysis** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Dependency tree** | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
+| **Find unused deps** | ✅ Yes | ❌ No | ❌ No | ✅ Yes |
+| **Security audit** | ❌ No | ❌ No | ✅ Yes | ❌ No |
+| **Package alternatives** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Environment comparison** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Docker optimization** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **JSON export** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Multiple format support** | ✅ Yes | ❌ No | ❌ No | Limited |
+
+**When to use pkgsizer:**
+- You need to know how much disk space packages use
+- You're optimizing Docker images
+- You want to compare environment sizes
+- You need size-based alternative suggestions
+- You want to enforce size budgets in CI/CD
+
+**When to use other tools:**
+- **pipdeptree**: Just need dependency visualization (no size info)
+- **pip-audit**: Need security vulnerability scanning
+- **deptry**: Only need unused dependency detection (no size analysis)
+
 ## Related Projects
 
-- [pipdeptree](https://github.com/tox-dev/pipdeptree) - Display dependency tree
+- [pipdeptree](https://github.com/tox-dev/pipdeptree) - Display dependency tree (no size analysis)
 - [pip-audit](https://github.com/pypa/pip-audit) - Security vulnerability scanner
-- [deptry](https://github.com/fpgmaas/deptry) - Find unused dependencies
+- [deptry](https://github.com/fpgmaas/deptry) - Find unused dependencies (no size analysis)
+- [pipreqs](https://github.com/bndr/pipreqs) - Generate requirements.txt from imports
 
 ## Acknowledgments
 
