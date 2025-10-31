@@ -1,6 +1,25 @@
 # pkgsizer
 
-A Python package size analyzer that measures installed on-disk sizes of Python packages and their subpackages.
+**Python Package Size Analyzer** - Measure, analyze, and optimize Python package disk sizes. Find unused dependencies, analyze dependency trees, compare environments, and optimize Docker images.
+
+pkgsizer is a comprehensive tool for analyzing Python package sizes and dependencies. It helps developers:
+- 📦 **Measure package disk sizes** - See how much space each package uses
+- 🔍 **Analyze dependencies** - Understand your dependency tree and why packages are installed
+- 🗑️ **Find unused packages** - Discover dependencies you're not using
+- 💡 **Find alternatives** - Get suggestions for lighter package alternatives
+- 🔄 **Compare environments** - Side-by-side comparison of different Python environments
+- 🐳 **Optimize Docker images** - Reduce image sizes by identifying large dependencies
+
+## What is pkgsizer?
+
+pkgsizer is a Python package size analyzer that helps developers understand and optimize their Python environment sizes. Whether you're optimizing Docker images, analyzing dependencies, or trying to reduce your project's footprint, pkgsizer provides the insights you need.
+
+**Use cases:**
+- **Docker image optimization**: Identify large packages before building images
+- **Dependency cleanup**: Find and remove unused dependencies
+- **Environment analysis**: Compare development vs production environments
+- **Package size auditing**: Track package sizes over time
+- **CI/CD integration**: Fail builds if dependencies exceed size thresholds
 
 ## Features
 
@@ -32,10 +51,12 @@ pip install pkgsizer
 Or install from source:
 
 ```bash
-git clone https://github.com/yourusername/pkgsizer.git
+git clone https://github.com/YOUR_USERNAME/pkgsizer.git
 cd pkgsizer
 pip install -e .
 ```
+
+> **Note**: Replace `YOUR_USERNAME` with your actual GitHub username once the repository is created.
 
 ## Quick Start
 
@@ -352,6 +373,18 @@ dependencies:
   - pip:
     - requests>=2.26.0
 ```
+
+## Search Terms
+
+Looking for pkgsizer? You might search for:
+- "python package size analyzer"
+- "python dependency size checker"
+- "measure python package disk size"
+- "python unused dependencies finder"
+- "docker python image optimizer"
+- "python dependency tree analyzer"
+- "pkgsizer python"
+- "python package size tool"
 
 ## Use Cases
 
