@@ -32,7 +32,7 @@ Command Line:
     $ pkgsizer alternatives pandas
     $ pkgsizer compare env1 env2
 
-Project: https://github.com/YOUR_USERNAME/pkgsizer
+Project: https://github.com/wassimbensalem/pkgsizer
 PyPI: https://pypi.org/project/pkgsizer/
 """
 

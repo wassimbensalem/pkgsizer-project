@@ -80,7 +80,7 @@ python -m twine upload dist/*
 ### Push Code
 ```bash
 cd /Users/wassimbensalem/pkgsizer-project
-git remote add origin https://github.com/YOUR_USERNAME/pkgsizer.git
+git remote add origin https://github.com/wassimbensalem/pkgsizer.git
 git branch -M main
 git push -u origin main
 ```

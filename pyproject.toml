@@ -66,11 +66,11 @@ dev = [
 pkgsizer = "pkgsizer.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/YOUR_USERNAME/pkgsizer"
-Documentation = "https://github.com/YOUR_USERNAME/pkgsizer#readme"
-Repository = "https://github.com/YOUR_USERNAME/pkgsizer"
-Issues = "https://github.com/YOUR_USERNAME/pkgsizer/issues"
-Changelog = "https://github.com/YOUR_USERNAME/pkgsizer/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/wassimbensalem/pkgsizer"
+Documentation = "https://github.com/wassimbensalem/pkgsizer#readme"
+Repository = "https://github.com/wassimbensalem/pkgsizer"
+Issues = "https://github.com/wassimbensalem/pkgsizer/issues"
+Changelog = "https://github.com/wassimbensalem/pkgsizer/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["."]
