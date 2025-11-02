@@ -1,0 +1,38 @@
+name: pkgsizer
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  size-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Scan Python environment with pkgsizer
+        uses: ./.github/actions/pkgsizer
+        with:
+          python-version: '3.11'
+          fail-over: '800MB'
+          include-deps: 'true'
+          top: '25'
+          json-report: 'artifacts/pkgsizer-report.json'
+          html-report: 'artifacts/pkgsizer-report.html'
+          extra-args: '--tree'
+
+      - name: Upload pkgsizer artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkgsizer-report
+          path: artifacts/
+

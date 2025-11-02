@@ -1,7 +1,6 @@
 """Parse Conda environment.yml files."""
 
 from pathlib import Path
-import yaml
 
 
 def parse_conda(file_path: Path) -> list[str]:
@@ -15,7 +14,14 @@ def parse_conda(file_path: Path) -> list[str]:
         List of package names
     """
     packages: list[str] = []
-    
+
+    try:
+        import yaml  # type: ignore
+    except ModuleNotFoundError as exc:
+        raise RuntimeError(
+            "Parsing Conda files requires PyYAML. Install pkgsizer[yaml] and retry."
+        ) from exc
+
     with open(file_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     

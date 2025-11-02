@@ -2,6 +2,25 @@
 
 All notable changes to pkgsizer will be documented in this file.
 
+## [Unreleased]
+
+_No unreleased changes yet._
+
+## [0.1.2] - 2025-10-31
+
+### 🆕 Added
+- **Interactive HTML reports**: `pkgsizer scan-env --html report.html` now generates a shareable HTML dashboard with charts, searchable tables, and summary insights.
+- **GitHub Action**: Composite action (`.github/actions/pkgsizer`) for CI/CD workflows, plus an example workflow for quick adoption.
+- **GitLab CI/CD template**: Added `.gitlab-ci.yml` for quick integration into GitLab pipelines.
+- **SEO landing page**: New `docs/index.html` optimized for search engines and GitHub Pages.
+- **Optional extras**: `pkgsizer[html]`, `pkgsizer[yaml]`, and `pkgsizer[all]` extras reduce default install size while keeping advanced features available.
+- **README examples**: Additional GitHub/GitLab snippets and quick-start commands.
+
+### ✨ Improved
+- **Live progress bars**: Long-running scans now show progress feedback in the terminal when 10+ packages are processed.
+- **Error messaging**: CLI commands provide actionable hints for common issues like missing paths, optional dependencies, or invalid thresholds.
+- **Keyword metadata**: Added GitHub/GitLab/CLI keywords to improve PyPI and search engine discoverability.
+
 ## [0.3.0] - 2025-10-30 - Week 2 Features
 
 ### 🆕 Added

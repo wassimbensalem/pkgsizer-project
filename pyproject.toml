@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pkgsizer"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python package size analyzer - measures disk sizes of installed packages, analyzes dependencies, finds unused packages, suggests alternatives, compares environments, and optimizes Docker images. CLI tool for Python developers to optimize package footprints."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -29,6 +29,9 @@ keywords = [
     "dependency-tree",
     "package-optimization",
     "environment-analysis",
+    "gitlab-ci",
+    "github-actions",
+    "command-line-tool",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -51,7 +54,6 @@ dependencies = [
     "rich>=13.0.0",
     "packaging>=23.0",
     "tomli>=2.0.0; python_version < '3.11'",
-    "PyYAML>=6.0",
 ]
 
 [project.optional-dependencies]
@@ -60,13 +62,33 @@ dev = [
     "pytest-cov>=4.0.0",
     "mypy>=1.0.0",
     "ruff>=0.1.0",
+    "Jinja2>=3.1.0",
+    "PyYAML>=6.0",
+]
+html = [
+    "Jinja2>=3.1.0",
+]
+yaml = [
+    "PyYAML>=6.0",
+]
+all = [
+    "Jinja2>=3.1.0",
+    "PyYAML>=6.0",
 ]
 
 [project.scripts]
 pkgsizer = "pkgsizer.cli:app"
 
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+pkgsizer = [
+    "templates/*.html",
+]
+
 [project.urls]
-Homepage = "https://github.com/wassimbensalem/pkgsizer"
+Homepage = "https://wassimbensalem.github.io/pkgsizer"
 Documentation = "https://github.com/wassimbensalem/pkgsizer#readme"
 Repository = "https://github.com/wassimbensalem/pkgsizer"
 Issues = "https://github.com/wassimbensalem/pkgsizer/issues"

@@ -1,0 +1,102 @@
+name: "pkgsizer environment scan"
+description: "Scan Python environments for package disk usage using pkgsizer"
+
+inputs:
+  python-version:
+    description: "Python version to use"
+    required: false
+    default: "3.11"
+  fail-over:
+    description: "Fail if total size exceeds threshold (e.g., '500MB')"
+    required: false
+    default: ""
+  include-deps:
+    description: "Include dependency sizes in totals"
+    required: false
+    default: "false"
+  top:
+    description: "Limit report to top N packages"
+    required: false
+    default: "20"
+  json-report:
+    description: "Path for JSON report (leave empty to skip)"
+    required: false
+    default: "pkgsizer-report.json"
+  html-report:
+    description: "Path for HTML report (leave empty to skip)"
+    required: false
+    default: "pkgsizer-report.html"
+  extra-args:
+    description: "Additional CLI arguments to pass to pkgsizer"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "${{ inputs.python-version }}"
+
+    - name: Install pkgsizer
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pkgsizer
+
+    - name: Run pkgsizer scan
+      id: run
+      shell: bash
+      env:
+        PKGSIZER_FAIL_OVER: "${{ inputs.fail-over }}"
+        PKGSIZER_INCLUDE_DEPS: "${{ inputs.include-deps }}"
+        PKGSIZER_TOP: "${{ inputs.top }}"
+        PKGSIZER_JSON_REPORT: "${{ inputs.json-report }}"
+        PKGSIZER_HTML_REPORT: "${{ inputs.html-report }}"
+        PKGSIZER_EXTRA_ARGS: "${{ inputs.extra-args }}"
+      run: |
+        set -euo pipefail
+
+        command=(pkgsizer scan-env)
+
+        if [[ -n "$PKGSIZER_TOP" ]]; then
+          command+=(--top "$PKGSIZER_TOP")
+        fi
+
+        if [[ "${PKGSIZER_INCLUDE_DEPS,,}" == "true" ]]; then
+          command+=(--include-deps)
+        fi
+
+        if [[ -n "$PKGSIZER_FAIL_OVER" ]]; then
+          command+=(--fail-over "$PKGSIZER_FAIL_OVER")
+        fi
+
+        if [[ -n "$PKGSIZER_JSON_REPORT" ]]; then
+          mkdir -p "$(dirname "$PKGSIZER_JSON_REPORT")"
+          command+=(--json "$PKGSIZER_JSON_REPORT")
+        fi
+
+        if [[ -n "$PKGSIZER_HTML_REPORT" ]]; then
+          mkdir -p "$(dirname "$PKGSIZER_HTML_REPORT")"
+          command+=(--html "$PKGSIZER_HTML_REPORT")
+        fi
+
+        if [[ -n "$PKGSIZER_EXTRA_ARGS" ]]; then
+          # shellcheck disable=SC2206
+          extra=( $PKGSIZER_EXTRA_ARGS )
+          command+=("${extra[@]}")
+        fi
+
+        echo "Running: ${command[*]}"
+        "${command[@]}"
+
+    - name: Upload reports
+      if: ${{ inputs.json-report != '' || inputs.html-report != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pkgsizer-reports
+        path: |
+          ${{ inputs.json-report }}
+          ${{ inputs.html-report }}
+

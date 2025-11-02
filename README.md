@@ -19,6 +19,8 @@
 pip install pkgsizer
 ```
 
+**Docs:** https://wassimbensalem.github.io/pkgsizer
+
 **Quick Example:**
 ```bash
 # Find largest packages
@@ -65,7 +67,7 @@ Use **pkgsizer** when you need to:
 - 🌳 **Dependency Tree Analysis**: Track sizes through dependency graph with configurable depth
 - 📂 **Subpackage Enumeration**: Drill down into package submodules to specific depth levels
 - 🔄 **Multiple Input Formats**: Support for `requirements.txt`, Poetry, uv, pip-tools, and Conda files
-- 📊 **Rich Output**: Beautiful terminal tables and JSON export
+- 📊 **Rich Output**: Beautiful terminal tables with live progress bars, JSON export, and interactive HTML reports
 - 🎯 **Editable Install Support**: Detect and properly handle editable installs
 - 🚀 **Performance**: Fast parallel scanning with inode deduplication
 
@@ -84,6 +86,12 @@ Use **pkgsizer** when you need to:
 ```bash
 pip install pkgsizer
 ```
+
+### Optional Extras
+
+- HTML reports: `pip install "pkgsizer[html]"`
+- Conda environment parsing: `pip install "pkgsizer[yaml]"`
+- Everything enabled: `pip install "pkgsizer[all]"`
 
 Or install from source:
 
@@ -105,6 +113,9 @@ pkgsizer scan-env
 
 # Show only top 10 largest packages
 pkgsizer scan-env --top 10
+
+# Export an interactive HTML report
+pkgsizer scan-env --html report.html
 
 # Include dependency tree visualization
 pkgsizer scan-env --tree
@@ -267,6 +278,21 @@ pkgsizer scan-env --json -
 pkgsizer scan-env --json results.json --tree
 ```
 
+### HTML Output
+
+```bash
+# Generate interactive HTML report for current environment
+pkgsizer scan-env --html report.html
+
+# Combine HTML report with top filter
+pkgsizer scan-env --top 25 --html report.html
+
+# Export HTML while still showing console output
+pkgsizer scan-env --html report.html --json results.json
+```
+
+> **Note**: HTML output requires `pip install "pkgsizer[html]"`.
+
 ### CI/CD Integration
 
 ```bash
@@ -275,6 +301,81 @@ pkgsizer scan-env --fail-over 500MB
 
 # Exit code 1 if threshold exceeded
 pkgsizer analyze-file requirements.txt --fail-over 1GB --json - > sizes.json
+```
+
+### GitHub Actions
+
+```yaml
+# .github/workflows/pkgsizer.yml
+name: pkgsizer
+
+on: [push, pull_request]
+
+jobs:
+  check-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/pkgsizer
+        with:
+          python-version: '3.11'
+          fail-over: '800MB'
+          include-deps: 'true'
+          html-report: 'artifacts/pkgsizer-report.html'
+          json-report: 'artifacts/pkgsizer-report.json'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pkgsizer-report
+          path: artifacts/
+```
+
+### GitLab CI/CD
+
+```yaml
+# .gitlab-ci.yml
+stages:
+  - size-check
+
+pkgsizer:
+  stage: size-check
+  image: python:3.11
+  variables:
+    PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    PIP_NO_COLOR: "1"
+  before_script:
+    - python -m pip install --upgrade pip
+    - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - pip install .
+  script:
+    - pkgsizer scan-env --top 25 --include-deps --tree --html pkgsizer-report.html --json pkgsizer-report.json --fail-over 800MB
+  artifacts:
+    when: always
+    paths:
+      - pkgsizer-report.html
+      - pkgsizer-report.json
+    expire_in: 1 week
+```
+
+### GitLab CI/CD
+
+```yaml
+# .gitlab-ci.yml
+stages:
+  - size_check
+
+size_check:
+  stage: size_check
+  image: python:3.11
+  script:
+    - pip install --upgrade pip
+    - pip install "pkgsizer[all]"
+    - pkgsizer scan-env --top 25 --include-deps \
+        --html pkgsizer-report.html --json pkgsizer-report.json \
+        --fail-over 800MB
+  artifacts:
+    paths:
+      - pkgsizer-report.html
+      - pkgsizer-report.json
 ```
 
 ## CLI Reference
@@ -487,6 +588,16 @@ ruff check pkgsizer
 # Type checking
 mypy pkgsizer
 ```
+
+## SEO & Promotion
+
+- **Publish GitHub Pages**: Serve the `docs/` folder via GitHub Pages to provide a fast-loading landing page with meta tags.
+- **Submit to Search Engines**: Register the site with Google Search Console and Bing Webmaster Tools to speed up indexing.
+- **Cross-Link**: Mention pkgsizer in related repositories, blog posts, and social profiles using anchor text like "python package size analyzer".
+- **Create Rich Content**: Write a launch blog post and record a short demo video linking back to GitHub, PyPI, and the Docs site.
+- **Community Outreach**: Share updates on Reddit (`r/Python`), Hacker News, LinkedIn, PySlackers, and Discord communities.
+- **Tag Releases**: Publish GitHub releases with keyword-rich notes (e.g., "pkgsizer 0.1.2 - Python package size analyzer for Docker optimization").
+- **Monitor Analytics**: Use Google Analytics and Search Console to track impressions/clicks and fix crawl issues.
 
 ## Frequently Asked Questions (FAQ)
 

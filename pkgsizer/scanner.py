@@ -3,6 +3,15 @@
 from pathlib import Path
 from typing import Optional
 
+from rich.console import Console
+from rich.progress import (
+    Progress,
+    SpinnerColumn,
+    BarColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
+
 from pkgsizer.dist_metadata import enumerate_distributions, DistributionInfo
 from pkgsizer.graph import build_dependency_graph, DependencyNode
 from pkgsizer.size_calc import calculate_distribution_size, calculate_editable_size
@@ -81,54 +90,82 @@ def scan_environment(
     
     # Build dependency graph
     graph = build_dependency_graph(distributions, target_packages, depth)
+    total_packages = len(graph)
+
+    progress: Optional[Progress] = None
+    progress_task: Optional[int] = None
+    console = Console(stderr=True)
+    show_progress = console.is_terminal and total_packages > 10
+
+    if show_progress:
+        progress = Progress(
+            SpinnerColumn(style="cyan"),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(bar_width=None, style="blue"),
+            TextColumn("{task.percentage:>3.0f}%"),
+            TimeElapsedColumn(),
+            console=console,
+            transient=True,
+            expand=True,
+        )
+        progress.__enter__()
+        progress_task = progress.add_task("Scanning packages", total=total_packages)
     
     # Process each package in the graph
-    for pkg_name, node in graph.items():
-        dist_info = node.dist_info
-        
-        # Handle editable installs
-        if dist_info.editable:
-            if include_editable == "exclude":
+    try:
+        for pkg_name, node in graph.items():
+            dist_info = node.dist_info
+
+            # Handle editable installs
+            if dist_info.editable and include_editable == "exclude":
+                if progress and progress_task is not None:
+                    progress.advance(progress_task)
                 continue
-        
-        # Calculate size
-        if dist_info.editable and dist_info.editable_location:
-            # For editable installs, calculate size from source location
-            size_info = calculate_editable_size(
-                dist_info.editable_location,
-                follow_symlinks=follow_symlinks,
-                exclude_patterns=exclude_patterns,
-            )
-        else:
-            # For regular installs, use RECORD files
-            size_info = calculate_distribution_size(
-                dist_info.files,
-                follow_symlinks=follow_symlinks,
-                exclude_patterns=exclude_patterns,
-            )
-        
-        # Enumerate subpackages if requested
-        subpackages: list[SubpackageInfo] = []
-        if module_depth is not None or module_depth != 0:
-            if dist_info.top_level:
-                subpackages = enumerate_distribution_subpackages(
-                    site_packages_path,
-                    dist_info.top_level,
-                    max_depth=module_depth,
+
+            # Calculate size
+            if dist_info.editable and dist_info.editable_location:
+                # For editable installs, calculate size from source location
+                size_info = calculate_editable_size(
+                    dist_info.editable_location,
                     follow_symlinks=follow_symlinks,
                     exclude_patterns=exclude_patterns,
                 )
-        
-        # Create result
-        package_result = PackageResult(
-            dist_info=dist_info,
-            node=node,
-            total_size=size_info.size_bytes,
-            file_count=size_info.file_count,
-            subpackages=subpackages,
-        )
-        
-        results.add_package(package_result)
+            else:
+                # For regular installs, use RECORD files
+                size_info = calculate_distribution_size(
+                    dist_info.files,
+                    follow_symlinks=follow_symlinks,
+                    exclude_patterns=exclude_patterns,
+                )
+
+            # Enumerate subpackages if requested
+            subpackages: list[SubpackageInfo] = []
+            if module_depth is not None or module_depth != 0:
+                if dist_info.top_level:
+                    subpackages = enumerate_distribution_subpackages(
+                        site_packages_path,
+                        dist_info.top_level,
+                        max_depth=module_depth,
+                        follow_symlinks=follow_symlinks,
+                        exclude_patterns=exclude_patterns,
+                    )
+
+            # Create result
+            package_result = PackageResult(
+                dist_info=dist_info,
+                node=node,
+                total_size=size_info.size_bytes,
+                file_count=size_info.file_count,
+                subpackages=subpackages,
+            )
+
+            results.add_package(package_result)
+
+            if progress and progress_task is not None:
+                progress.advance(progress_task)
+    finally:
+        if progress:
+            progress.__exit__(None, None, None)
     
     return results
 

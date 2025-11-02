@@ -2,5 +2,6 @@ include README.md
 include LICENSE
 include pyproject.toml
 recursive-include pkgsizer *.py
+recursive-include pkgsizer/templates *.html
 recursive-include tests *.py
 

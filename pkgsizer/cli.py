@@ -35,6 +35,34 @@ def version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
+def _handle_cli_exception(error: Exception) -> None:
+    """Print a descriptive error with possible remediation hints."""
+    console.print(f"[red]Error:[/red] {error}")
+
+    hints: list[str] = []
+
+    if isinstance(error, FileNotFoundError):
+        hints.append("Verify the path exists and that pkgsizer has permission to read it.")
+        hints.append("If you're using --python, --venv, or --site-packages, double-check the value.")
+    elif isinstance(error, PermissionError):
+        hints.append("Rerun with sufficient permissions or scan a copy of the environment.")
+    elif isinstance(error, ValueError) and "size threshold" in str(error).lower():
+        hints.append("Use formats such as '500MB', '1GB', or provide a raw byte value (e.g., 1048576).")
+    elif "No module named" in str(error):
+        hints.append("Ensure the package is installed in the environment you're scanning.")
+    elif "requires PyYAML" in str(error):
+        hints.append("Install optional YAML support: pip install 'pkgsizer[yaml]'.")
+    elif "requires Jinja2" in str(error):
+        hints.append("Install HTML report support: pip install 'pkgsizer[html]'.")
+
+    if hints:
+        console.print("[yellow]Hints:[/yellow]")
+        for hint in hints:
+            console.print(f"  • {hint}")
+
+    raise typer.Exit(1)
+
+
 @app.callback()
 def main(
     version: Annotated[
@@ -76,6 +104,10 @@ def scan_env(
     json_output: Annotated[
         Optional[Path],
         typer.Option("--json", help="Output JSON to file (use '-' for stdout)"),
+    ] = None,
+    html_output: Annotated[
+        Optional[Path],
+        typer.Option("--html", help="Output HTML report to file (use '-' for stdout)"),
     ] = None,
     tree: Annotated[
         bool,
@@ -159,6 +191,7 @@ def scan_env(
         exit_code = render_report(
             results=results,
             json_output=json_output,
+            html_output=html_output,
             tree=tree,
             group_by=group_by,
             top=top,
@@ -166,13 +199,16 @@ def scan_env(
             fail_over=fail_over,
             console=console,
             include_dependencies=include_dependencies,
+            command_invocation="pkgsizer " + " ".join(sys.argv[1:]),
         )
 
         raise typer.Exit(exit_code)
 
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except KeyboardInterrupt:
+        console.print("[yellow]Aborted by user.[/yellow]")
         raise typer.Exit(1)
+    except Exception as e:
+        _handle_cli_exception(e)
 
 
 @app.command(name="analyze-file")
@@ -208,6 +244,10 @@ def analyze_file(
     json_output: Annotated[
         Optional[Path],
         typer.Option("--json", help="Output JSON to file (use '-' for stdout)"),
+    ] = None,
+    html_output: Annotated[
+        Optional[Path],
+        typer.Option("--html", help="Output HTML report to file (use '-' for stdout)"),
     ] = None,
     tree: Annotated[
         bool,
@@ -264,8 +304,7 @@ def analyze_file(
             raise typer.Exit(1)
 
         if not file_path.exists():
-            console.print(f"[red]Error:[/red] File not found: {file_path}")
-            raise typer.Exit(1)
+            raise FileNotFoundError(file_path)
 
         # Locate site-packages
         site_packages_path = locate_site_packages(
@@ -295,6 +334,7 @@ def analyze_file(
         exit_code = render_report(
             results=results,
             json_output=json_output,
+            html_output=html_output,
             tree=tree,
             group_by=group_by,
             top=top,
@@ -302,13 +342,16 @@ def analyze_file(
             fail_over=fail_over,
             console=console,
             include_dependencies=include_dependencies,
+            command_invocation="pkgsizer " + " ".join(sys.argv[1:]),
         )
 
         raise typer.Exit(exit_code)
 
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except KeyboardInterrupt:
+        console.print("[yellow]Aborted by user.[/yellow]")
         raise typer.Exit(1)
+    except Exception as e:
+        _handle_cli_exception(e)
 
 
 @app.command(name="why")
@@ -467,9 +510,11 @@ def why(
         
         console.print()
         
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except KeyboardInterrupt:
+        console.print("[yellow]Aborted by user.[/yellow]")
         raise typer.Exit(1)
+    except Exception as e:
+        _handle_cli_exception(e)
 
 
 @app.command(name="unused")
@@ -641,9 +686,11 @@ def unused(
             console.print(f"   • Wasted space: [red]{format_size(unused_size)}[/red]")
         console.print()
         
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except KeyboardInterrupt:
+        console.print("[yellow]Aborted by user.[/yellow]")
         raise typer.Exit(1)
+    except Exception as e:
+        _handle_cli_exception(e)
 
 
 @app.command(name="alternatives")
@@ -836,9 +883,11 @@ def alternatives(
             console.print(f"[dim]Use 'pkgsizer alternatives <package>' for details[/dim]")
             console.print()
     
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except KeyboardInterrupt:
+        console.print("[yellow]Aborted by user.[/yellow]")
         raise typer.Exit(1)
+    except Exception as e:
+        _handle_cli_exception(e)
 
 
 @app.command(name="updates")
@@ -972,9 +1021,11 @@ def updates(
             console.print(f"  [dim]{unavail_names}[/dim]")
             console.print()
     
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except KeyboardInterrupt:
+        console.print("[yellow]Aborted by user.[/yellow]")
         raise typer.Exit(1)
+    except Exception as e:
+        _handle_cli_exception(e)
 
 
 @app.command(name="compare")
@@ -1147,9 +1198,11 @@ def compare(
                 console.print(f"  [dim]... and {len(result['details']['only_in_env2']) - 10} more[/dim]")
             console.print()
     
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except KeyboardInterrupt:
+        console.print("[yellow]Aborted by user.[/yellow]")
         raise typer.Exit(1)
+    except Exception as e:
+        _handle_cli_exception(e)
 
 
 if __name__ == "__main__":

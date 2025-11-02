@@ -40,6 +40,8 @@ This document summarizes all the SEO improvements made to improve pkgsizer's dis
   - Includes: "python package size analyzer", "dependency size checker", etc.
 
 - ✅ **GitHub URL Note**: Added note about replacing placeholder URL
+- ✅ **CI/CD Content**: Documented GitHub Actions and GitLab CI snippets to capture "github actions" and "gitlab ci" searches
+- ✅ **Extras Documentation**: Mentioned `pkgsizer[html]`, `pkgsizer[yaml]`, `pkgsizer[all]` to rank for targeted feature queries
 
 ## 🎯 Next Steps for Maximum SEO
 
@@ -102,12 +104,21 @@ This document summarizes all the SEO improvements made to improve pkgsizer's dis
    - Include "pkgsizer" naturally in content
    - Link back to GitHub/PyPI
 
-4. **Community Engagement**:
+4. **Enable GitHub Pages**:
+   - Publish the new `docs/index.html` landing page
+   - Add sitemap to Search Console for faster indexing
+
+5. **Structured Data**:
+   - Embed JSON-LD metadata in blog posts or docs for "SoftwareApplication" rich snippets
+   - Include keywords like "python package size analyzer" and "docker optimization"
+
+6. **Community Engagement**:
    - Share on Reddit (r/Python, r/programming)
    - Twitter/X with relevant hashtags
    - Python Discord/Slack communities
+   - Hacker News (#showhn) when launching new features
 
-5. **Create Example Projects**:
+7. **Create Example Projects**:
    - Example Docker optimization workflow
    - Tutorial videos/articles
    - Link from README

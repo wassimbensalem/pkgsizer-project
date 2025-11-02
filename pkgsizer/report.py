@@ -531,6 +531,7 @@ def subpackage_to_json(subpkg: SubpackageInfo) -> dict[str, Any]:
 def render_report(
     results: ScanResults,
     json_output: Optional[Path],
+    html_output: Optional[Path],
     tree: bool,
     group_by: str,
     top: Optional[int],
@@ -538,6 +539,7 @@ def render_report(
     fail_over: Optional[str],
     console: Console,
     include_dependencies: bool = False,
+    command_invocation: Optional[str] = None,
 ) -> int:
     """
     Render the final report.
@@ -545,6 +547,7 @@ def render_report(
     Args:
         results: Scan results
         json_output: Path to output JSON (or "-" for stdout)
+        html_output: Path to output HTML report (or "-" for stdout)
         tree: Show tree view
         group_by: Group by "dist", "module", or "file"
         top: Show only top N packages
@@ -552,6 +555,7 @@ def render_report(
         fail_over: Fail if total size exceeds threshold
         console: Rich console
         include_dependencies: Include dependency sizes in totals
+        command_invocation: Original CLI command invocation (for metadata)
     
     Returns:
         Exit code (0 = success, 1 = failure)
@@ -575,17 +579,43 @@ def render_report(
     if json_output:
         json_data = to_json(results)
         json_str = json.dumps(json_data, indent=2)
-        
+
         if str(json_output) == "-":
             console.print(json_str)
         else:
-            with open(json_output, "w") as f:
+            with open(json_output, "w", encoding="utf-8") as f:
                 f.write(json_str)
             console.print(f"[dim]JSON output written to:[/dim] {json_output}")
-    
+
     # Render table (unless JSON to stdout)
     if not json_output or str(json_output) != "-":
         render_table(results, console, top, sort_by, tree, include_dependencies)
-    
+
+    # Produce HTML report if requested
+    if html_output:
+        try:
+            from pkgsizer.html_report import render_html_report
+
+            html_target = str(html_output)
+            html_content = render_html_report(
+                results,
+                top=top,
+                sort_by=sort_by,
+                include_dependencies=include_dependencies,
+                command_invocation=command_invocation,
+            )
+
+            if html_target == "-":
+                console.print(html_content)
+            else:
+                html_path = Path(html_output)
+                html_path.parent.mkdir(parents=True, exist_ok=True)
+                html_path.write_text(html_content, encoding="utf-8")
+                console.print(f"[dim]HTML report written to:[/dim] {html_path}")
+        except RuntimeError as exc:
+            console.print(f"[red]Error:[/red] {exc}")
+            console.print("[yellow]Hint:[/yellow] Install pkgsizer[html] to enable HTML reports.")
+            exit_code = 1
+
     return exit_code
 

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" integrity="sha384-sn4l5LS0w1nVd8w/DAo7xNvC9TTm+E1tnqJZIMgkGz4rIuAlW2tA4zQCHyt09GL3" crossorigin="anonymous"></script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0f172a;
+        --bg-card: rgba(30, 41, 59, 0.8);
+        --border: rgba(148, 163, 184, 0.2);
+        --text: #e2e8f0;
+        --text-dim: #94a3b8;
+        --accent: #38bdf8;
+        --accent-2: #a855f7;
+        --success: #22c55e;
+        --warning: #fbbf24;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(145deg, #0f172a, #1e293b 55%, #111827 100%);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .container {
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+
+      header .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.95rem;
+        color: var(--text-dim);
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.2rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .card {
+        backdrop-filter: blur(18px);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 1.4rem 1.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        box-shadow: 0 20px 35px -25px rgba(15, 23, 42, 0.9);
+      }
+
+      .card span.label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+      }
+
+      .card strong {
+        font-size: 1.75rem;
+        font-weight: 600;
+      }
+
+      .panels {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .panel {
+        backdrop-filter: blur(18px);
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 1.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.4rem;
+        box-shadow: 0 28px 45px -30px rgba(15, 23, 42, 0.95);
+      }
+
+      canvas {
+        width: 100% !important;
+        height: 280px !important;
+      }
+
+      .table-tools {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .search {
+        position: relative;
+        flex: 1;
+        min-width: 240px;
+      }
+
+      .search input {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.65);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 0.75rem 1rem 0.75rem 2.6rem;
+        color: var(--text);
+        font-size: 0.95rem;
+        transition: border 0.2s ease;
+      }
+
+      .search input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .search svg {
+        position: absolute;
+        top: 50%;
+        left: 0.9rem;
+        transform: translateY(-50%);
+        width: 1.2rem;
+        height: 1.2rem;
+        stroke: var(--text-dim);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+        font-size: 0.92rem;
+      }
+
+      thead {
+        background: rgba(56, 189, 248, 0.08);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.8rem;
+      }
+
+      thead th {
+        padding: 0.9rem 1rem;
+        text-align: left;
+        color: var(--text-dim);
+        font-weight: 600;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+        transition: background 0.2s ease;
+      }
+
+      tbody tr:hover {
+        background: rgba(56, 189, 248, 0.08);
+      }
+
+      tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+      }
+
+      tbody td small {
+        display: block;
+        color: var(--text-dim);
+        font-size: 0.75rem;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text);
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+      }
+
+      .badge.editable {
+        background: rgba(168, 85, 247, 0.16);
+        border-color: rgba(168, 85, 247, 0.4);
+      }
+
+      .badge.transitive {
+        background: rgba(16, 185, 129, 0.12);
+        border-color: rgba(16, 185, 129, 0.26);
+      }
+
+      .badge.direct {
+        background: rgba(14, 165, 233, 0.12);
+        border-color: rgba(14, 165, 233, 0.35);
+      }
+
+      footer {
+        margin-top: 3rem;
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+      }
+
+      .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+      }
+
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.15);
+      }
+
+      .legend-swatch {
+        width: 0.8rem;
+        height: 0.8rem;
+        border-radius: 999px;
+      }
+
+      .no-data {
+        padding: 1rem;
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 1.5rem 1rem 3rem;
+        }
+
+        .cards,
+        .panels {
+          gap: 1rem;
+        }
+
+        table {
+          font-size: 0.85rem;
+        }
+
+        tbody td,
+        thead th {
+          padding: 0.7rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div>
+          <h1>📦 pkgsizer Report</h1>
+          <p style="color: var(--text-dim); margin-top: 0.4rem;">
+            Generated {{ generated_at }} • {{ packages|length }} packages displayed{{ " • Top " ~ displayed_count ~ " sorted by " ~ sort_label if displayed_count < total_packages else "" }}
+          </p>
+        </div>
+        <div class="meta">
+          <span>Environment: <strong>{{ summary.site_packages }}</strong></span>
+          <span>CLI command: <code>{{ command_invocation }}</code></span>
+        </div>
+      </header>
+
+      <section class="cards">
+        <div class="card">
+          <span class="label">Packages</span>
+          <strong>{{ summary.package_count }}</strong>
+        </div>
+        <div class="card">
+          <span class="label">Total Size</span>
+          <strong>{{ summary.total_size_formatted }}</strong>
+          <span style="color: var(--text-dim); font-size: 0.9rem;">{{ summary.total_size_bytes | format_number }} bytes</span>
+        </div>
+        <div class="card">
+          <span class="label">Files</span>
+          <strong>{{ summary.total_files | format_number }}</strong>
+        </div>
+        {% if include_dependencies %}
+        <div class="card">
+          <span class="label">Total Size with Dependencies</span>
+          <strong>{{ summary.total_with_deps }}</strong>
+        </div>
+        {% endif %}
+      </section>
+
+      <section class="panels">
+        <div class="panel">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h2 style="font-size: 1.1rem;">Top Packages by Size</h2>
+            <span style="font-size: 0.85rem; color: var(--text-dim);">Top {{ chart_data|length }} packages</span>
+          </div>
+          {% if chart_data %}
+          <canvas id="sizeChart"></canvas>
+          <div class="chart-legend" id="chartLegend"></div>
+          {% else %}
+          <div class="no-data">No packages available to chart.</div>
+          {% endif %}
+        </div>
+
+        <div class="panel">
+          <h2 style="font-size: 1.1rem;">Insights</h2>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.8rem; color: var(--text-dim);">
+            <li>• Largest package: <strong>{{ insights.largest_package.name }}</strong> ({{ insights.largest_package.size }})</li>
+            <li>• Median package size: <strong>{{ insights.median_size }}</strong></li>
+            <li>• Average package size: <strong>{{ insights.average_size }}</strong></li>
+            <li>• Direct packages: <strong>{{ insights.direct_packages }}</strong> • Transitive: <strong>{{ insights.transitive_packages }}</strong></li>
+            {% if include_dependencies %}
+            <li>• Largest cumulative dependency: <strong>{{ insights.largest_with_deps.name }}</strong> ({{ insights.largest_with_deps.size }})</li>
+            {% endif %}
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="table-tools">
+          <h2 style="font-size: 1.1rem;">Package Details</h2>
+          <div class="search">
+            <input id="search" type="search" placeholder="Search packages, versions, dependency type..." aria-label="Search packages" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7.5 7.5 0 10-10.607 0 7.5 7.5 0 0010.607 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          {% if packages %}
+          <table id="packageTable">
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Version</th>
+                <th>Size</th>
+                {% if include_dependencies %}<th>With Dependencies</th>{% endif %}
+                <th>Files</th>
+                <th>Depth</th>
+                <th>Type</th>
+                <th>Editable</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pkg in packages %}
+              <tr>
+                <td>
+                  <strong>{{ pkg.name }}</strong>
+                  <small>{{ pkg.location }}</small>
+                </td>
+                <td>{{ pkg.version }}</td>
+                <td>{{ pkg.size }}</td>
+                {% if include_dependencies %}
+                <td>{{ pkg.size_with_deps }}</td>
+                {% endif %}
+                <td>{{ pkg.file_count | format_number }}</td>
+                <td>{{ pkg.depth }}</td>
+                <td>
+                  <span class="badge {{ pkg.type }}">{{ pkg.type|title }}</span>
+                </td>
+                <td>
+                  {% if pkg.editable %}
+                  <span class="badge editable">Editable</span>
+                  {% else %}
+                  <span style="color: var(--text-dim);">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="no-data">No packages to display.</div>
+          {% endif %}
+        </div>
+      </section>
+
+      <footer>
+        Generated with <strong>pkgsizer</strong>. Report created at {{ generated_at }}.
+      </footer>
+    </div>
+
+    <script>
+      const chartData = {{ chart_data | tojson }};
+      const chartElement = document.getElementById("sizeChart");
+
+      if (chartElement && chartData.length > 0) {
+        const colors = [
+          "#38bdf8",
+          "#a855f7",
+          "#f97316",
+          "#22d3ee",
+          "#f43f5e",
+          "#2dd4bf",
+          "#c084fc",
+          "#facc15",
+          "#4ade80",
+          "#f472b6"
+        ];
+
+        const backgroundColors = chartData.map((_, index) => colors[index % colors.length]);
+
+        const chart = new Chart(chartElement, {
+          type: "bar",
+          data: {
+            labels: chartData.map((item) => item.name),
+            datasets: [
+              {
+                label: "Size (MB)",
+                data: chartData.map((item) => item.size_mb),
+                backgroundColor: backgroundColors,
+                borderRadius: 8,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (context) => `${context.raw.toFixed(2)} MB (${chartData[context.dataIndex].size})`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                ticks: {
+                  color: "#cbd5f5",
+                },
+                grid: {
+                  display: false,
+                },
+              },
+              y: {
+                ticks: {
+                  color: "#94a3b8",
+                },
+                grid: {
+                  color: "rgba(148, 163, 184, 0.1)",
+                },
+              },
+            },
+          },
+        });
+
+        const legend = document.getElementById("chartLegend");
+        legend.innerHTML = chartData
+          .map((item, index) => `
+            <span class="legend-item">
+              <span class="legend-swatch" style="background: ${backgroundColors[index]}"></span>
+              ${item.name}
+            </span>
+          `)
+          .join("");
+      }
+
+      const searchInput = document.getElementById("search");
+      const table = document.getElementById("packageTable");
+
+      if (searchInput && table) {
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+
+        const applyFilter = () => {
+          const query = searchInput.value.trim().toLowerCase();
+
+          rows.forEach((row) => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(query) ? "" : "none";
+          });
+        };
+
+        searchInput.addEventListener("input", applyFilter);
+      }
+    </script>
+  </body>
+</html>
+

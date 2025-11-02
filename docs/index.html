@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>pkgsizer &mdash; Python Package Size Analyzer</title>
+    <meta name="description" content="pkgsizer is the Python package size analyzer CLI for measuring disk usage, finding unused dependencies, optimizing Docker images, and integrating with GitHub Actions and GitLab CI/CD." />
+    <meta name="keywords" content="pkgsizer, python package size analyzer, dependency size, docker optimization, python cli, gitlab ci, github actions, unused dependencies, python package size" />
+    <meta property="og:title" content="pkgsizer &mdash; Python Package Size Analyzer" />
+    <meta property="og:description" content="Measure Python package disk usage, find unused dependencies, compare environments, and export interactive HTML reports." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://wassimbensalem.github.io/pkgsizer" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="pkgsizer &mdash; Python Package Size Analyzer" />
+    <meta name="twitter:description" content="Measure Python package disk usage, find unused dependencies, compare environments, and export HTML reports." />
+    <link rel="canonical" href="https://wassimbensalem.github.io/pkgsizer" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #0ea5e9, #0f172a 60%);
+        color: #f8fafc;
+        display: flex;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1.5rem;
+      }
+      main {
+        max-width: 860px;
+        background: rgba(15, 23, 42, 0.85);
+        border-radius: 28px;
+        box-shadow: 0 40px 80px -40px rgba(15, 23, 42, 0.9);
+        padding: 3rem;
+        backdrop-filter: blur(16px);
+      }
+      h1 {
+        margin: 0 0 1rem;
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+      p {
+        line-height: 1.6;
+        opacity: 0.92;
+      }
+      .cta {
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 1.4rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      a.button.primary {
+        background-color: #38bdf8;
+        color: #0f172a;
+        box-shadow: 0 12px 24px -12px rgba(56, 189, 248, 0.75);
+      }
+      a.button.secondary {
+        background-color: rgba(148, 163, 184, 0.25);
+        color: #e2e8f0;
+        box-shadow: 0 8px 20px -12px rgba(148, 163, 184, 0.6);
+      }
+      a.button:hover {
+        transform: translateY(-2px);
+      }
+      ul.features {
+        margin: 2rem 0 0;
+        padding-left: 1.1rem;
+        display: grid;
+        gap: 0.8rem;
+      }
+      ul.features li::marker {
+        color: #38bdf8;
+      }
+      footer {
+        margin-top: 2.5rem;
+        font-size: 0.9rem;
+        color: rgba(226, 232, 240, 0.7);
+      }
+      @media (max-width: 640px) {
+        main {
+          padding: 2rem;
+        }
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>pkgsizer &mdash; Python Package Size Analyzer</h1>
+      <p>
+        pkgsizer helps developers measure Python package disk usage, visualize dependency trees, find unused dependencies, suggest lighter alternatives, and optimize Docker images. Export interactive HTML reports, enforce size budgets in CI/CD, and integrate with GitHub Actions or GitLab pipelines.
+      </p>
+      <div class="cta">
+        <a class="button primary" href="https://pypi.org/project/pkgsizer/">Install on PyPI</a>
+        <a class="button secondary" href="https://github.com/wassimbensalem/pkgsizer">View on GitHub</a>
+        <a class="button secondary" href="https://github.com/wassimbensalem/pkgsizer#readme">Documentation</a>
+      </div>
+      <ul class="features">
+        <li>Measure Python package disk usage with Rich terminal tables and progress bars.</li>
+        <li>Analyze dependency trees, compare environments, and find unused dependencies.</li>
+        <li>Export JSON or interactive HTML reports for dashboards and CI artifacts.</li>
+        <li>CI/CD ready with GitHub Actions and GitLab CI recipes.</li>
+        <li>Optimized for search discoverability with metadata and keyword-rich content.</li>
+      </ul>
+      <footer>
+        © {{ current_year }} pkgsizer. Made for Python developers who care about package size.
+      </footer>
+    </main>
+    <script>
+      document.body.innerHTML = document.body.innerHTML.replace("{{ current_year }}", new Date().getFullYear());
+    </script>
+  </body>
+</html>
+

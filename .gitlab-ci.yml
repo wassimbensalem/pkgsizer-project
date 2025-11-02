@@ -1,0 +1,29 @@
+stages:
+  - size_check
+
+variables:
+  PYTHON_VERSION: "3.11"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_COLOR: "1"
+
+size_check:
+  stage: size_check
+  image: python:${PYTHON_VERSION}
+  before_script:
+    - python -m pip install --upgrade pip
+    - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - pip install .  # install pkgsizer from repo
+  script:
+    - pkgsizer scan-env --top 25 --include-deps --tree \
+        --html pkgsizer-report.html --json pkgsizer-report.json \
+        --fail-over 800MB
+  artifacts:
+    when: always
+    paths:
+      - pkgsizer-report.html
+      - pkgsizer-report.json
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+
