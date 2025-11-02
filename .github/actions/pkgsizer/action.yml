@@ -43,7 +43,12 @@ runs:
       shell: bash
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pkgsizer
+        # Install from repository if available, otherwise from PyPI with extras
+        if [ -f "pyproject.toml" ] || [ -f "setup.py" ]; then
+          python -m pip install ".[all]"
+        else
+          python -m pip install "pkgsizer[all]"
+        fi
 
     - name: Run pkgsizer scan
       id: run
