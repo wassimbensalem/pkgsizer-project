@@ -94,7 +94,19 @@ runs:
         fi
 
         echo "Running: ${command[*]}"
+        # Run command and preserve exit code
+        set +e  # Temporarily disable exit on error
         "${command[@]}"
+        exit_code=$?
+        set -e  # Re-enable exit on error
+        
+        if [[ $exit_code -eq 0 ]]; then
+          echo "✅ pkgsizer scan completed successfully"
+        else
+          echo "❌ pkgsizer scan failed with exit code: $exit_code"
+        fi
+        
+        exit $exit_code
 
     - name: Upload reports
       if: ${{ inputs.json-report != '' || inputs.html-report != '' }}
